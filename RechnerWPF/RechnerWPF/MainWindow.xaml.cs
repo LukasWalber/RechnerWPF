@@ -1,19 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace RechnerWPF
 {
@@ -22,6 +11,7 @@ namespace RechnerWPF
     {
         string zwischenwert = "";
         string eingabeKlammerMulti;
+        string eingabeProzentRechnung;
         string eingabeOhneKlammern;
         string ergebnis = "";
         List<double> zahlen;
@@ -120,7 +110,8 @@ namespace RechnerWPF
         {
             if (!zwischenwert.Equals(""))
                 {
-                    eingabeKlammerMulti = KlammerMulti(zwischenwert);
+                    eingabeProzentRechnung = ProzentRechner(zwischenwert);
+                    eingabeKlammerMulti = KlammerMulti(eingabeProzentRechnung);
                     eingabeOhneKlammern = KlammerRechner(eingabeKlammerMulti);
                     zahlen = ZahlenFilter(eingabeOhneKlammern);
                     operatoren = OperatorFilter(eingabeOhneKlammern);
@@ -153,6 +144,28 @@ namespace RechnerWPF
                 zwischenwert = zwischenwert + eingabe;
             }
             textBlockAusgabe.Text = zwischenwert;
+        }
+
+        static string ProzentRechner(string eingabe)
+        {
+            string regexExpression = @"((^[-]\d +,\d +[\+\-\/\*\^](\d +,\d +|\d +)[%])| ^[-]\d +[\+\-\/\*\^](\d +,\d +|\d +)[%])| (\d +,\d +[\+\-\/\*\^])(\d +,\d +|\d +)[%]|(\d+[\+\-\/\*\^])(\d+,\d+|\d+)[%]|((?<=[\+\-\/\*\^\(])[-] (\d+,\d+[\+\-\/\*\^] (\d+,\d+|\d+)[%]|\d+[\+\-\/\*\^] (\d+,\d+|\d+)[%]))";   //zahl operator zahl und % zeichen match
+            List<double> prozentEingabe;
+            List<string> Aufgabenoperator;
+            double zwischenergebnis;
+
+            string[] ProzentAufgaben = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
+
+            foreach (string s in ProzentAufgaben)
+            {
+                prozentEingabe = ZahlenFilter(s);
+                Aufgabenoperator = OperatorFilter(s);
+                prozentEingabe[1] =  (prozentEingabe[1] / 100) * prozentEingabe[0];
+                zwischenergebnis = RechnerAusfuehren(prozentEingabe, Aufgabenoperator);
+                eingabe = eingabe.Replace(s, zwischenergebnis.ToString("G"));
+            }
+
+
+            return eingabe;
         }
 
         static string KlammerMulti(string eingabe)
@@ -338,10 +351,6 @@ namespace RechnerWPF
                 case "^":
 
                     return Math.Pow(zahl1, zahl2);
-
-                case "%":
-
-                    return (zahl1 / 100) * zahl2;
 
                 default:
                     throw new ArgumentException("wrong operator");
