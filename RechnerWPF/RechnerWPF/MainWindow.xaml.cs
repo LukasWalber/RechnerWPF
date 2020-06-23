@@ -12,6 +12,7 @@ namespace RechnerWPF
         string zwischenwert = "";
         string eingabeKlammerMulti;
         string eingabeProzentRechnung;
+        string eingabeTrigonometrieRechnung;
         string eingabeOhneKlammern;
         string ergebnis = "";
         List<double> zahlen;
@@ -96,6 +97,18 @@ namespace RechnerWPF
         {
             EingabeHinzufügen("%");
         }
+        private void ButtonCos_Click(object sender, RoutedEventArgs e)
+        {
+            EingabeHinzufügen("cos(");
+        }
+        private void ButtonSin_Click(object sender, RoutedEventArgs e)
+        {
+            EingabeHinzufügen("sin(");
+        }
+        private void ButtonTan_Click(object sender, RoutedEventArgs e)
+        {
+            EingabeHinzufügen("tan(");
+        }
         private void ButtonKomma_Click(object sender, RoutedEventArgs e)
         {
             EingabeHinzufügen(",");
@@ -111,7 +124,8 @@ namespace RechnerWPF
             if (!zwischenwert.Equals(""))
                 {
                     eingabeProzentRechnung = ProzentRechner(zwischenwert);
-                    eingabeKlammerMulti = KlammerMulti(eingabeProzentRechnung);
+                    eingabeTrigonometrieRechnung = trigonometrieRechner(eingabeProzentRechnung);
+                    eingabeKlammerMulti = KlammerMulti(eingabeTrigonometrieRechnung);
                     eingabeOhneKlammern = KlammerRechner(eingabeKlammerMulti);
                     zahlen = ZahlenFilter(eingabeOhneKlammern);
                     operatoren = OperatorFilter(eingabeOhneKlammern);
@@ -125,6 +139,8 @@ namespace RechnerWPF
             zwischenwert = "";
             textBlockAusgabe.Text = ergebnis;
         }
+
+
         private void EingabeHinzufügen(string eingabe)
         {
             if (ergebnis.Equals(""))
@@ -144,6 +160,50 @@ namespace RechnerWPF
                 zwischenwert = zwischenwert + eingabe;
             }
             textBlockAusgabe.Text = zwischenwert;
+        }
+        private string trigonometrieRechner(string eingabe)
+        {
+            string regexExpression = @"(sin|cos|tan)\([^(sin|cos|tan)]*?\)";
+
+            string trigErgebnis;
+            string[] trigMatches = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
+
+            if (trigMatches.Length == 0)
+            {
+                return eingabe;
+            }
+
+            do
+            {
+                foreach (string m in trigMatches) { 
+                trigErgebnis = KlammerRechner(m);
+                    if(m.Contains("sin"))
+                    {
+                        trigErgebnis = trigErgebnis.Substring(3);
+                        trigErgebnis = Convert.ToString(Math.Sin(Convert.ToDouble(trigErgebnis)));
+                        eingabe = eingabe.Replace(m, trigErgebnis);
+                    }
+                    if (m.Contains("cos"))
+                    {
+                        trigErgebnis = trigErgebnis.Substring(3);
+                        trigErgebnis = Convert.ToString(Math.Cos(Convert.ToDouble(trigErgebnis)));
+                        eingabe = eingabe.Replace(m, trigErgebnis);
+                    }
+                    if (m.Contains("tan"))
+                    {
+                        trigErgebnis = trigErgebnis.Substring(3);
+                        trigErgebnis = Convert.ToString(Math.Tan(Convert.ToDouble(trigErgebnis)));
+                        eingabe = eingabe.Replace(m, trigErgebnis);
+                    }
+                }
+
+            Array.Clear(trigMatches, 0, trigMatches.Length);
+
+            trigMatches = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
+
+            } while (trigMatches.Length != 0);
+
+            return eingabe;
         }
 
         static string ProzentRechner(string eingabe)
