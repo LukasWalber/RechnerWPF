@@ -43,6 +43,9 @@
         <Button Content="AC" Grid.Column="0" Grid.Row="1" Click="ButtonReset_Click"/>
         <Button Content="^" Grid.Column="4" Grid.Row="1" Click="ButtonHoch_Click"/>
         <Button Content="%" Grid.Column="4" Grid.Row="2" Click="ButtonProzent_Click"/>
+        <Button Content="cos(" Grid.Column="4" Grid.Row="3" Click="ButtonCos_Click"/>
+        <Button Content="sin(" Grid.Column="4" Grid.Row="4" Click="ButtonSin_Click"/>
+        <Button Content="tan(" Grid.Column="4" Grid.Row="5" Click="ButtonTan_Click"/>
         <TextBlock x:Name="textBlockAusgabe" Text="0" Grid.ColumnSpan="5" FontSize="40" />
     </Grid>
 </Window>
