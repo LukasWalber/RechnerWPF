@@ -1,0 +1,15 @@
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\RechnerWPF.csprojAssemblyReference.cache
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\MainWindow.g.cs
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\App.g.cs
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\RechnerWPF_MarkupCompile.cache
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\RechnerWPF_MarkupCompile.lref
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\bin\Debug\RechnerWPF.exe.config
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\bin\Debug\RechnerWPF.exe
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\bin\Debug\RechnerWPF.pdb
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\MainWindow.baml
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\RechnerWPF.g.resources
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\RechnerWPF.Properties.Resources.resources
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\RechnerWPF.csproj.GenerateResource.cache
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\RechnerWPF.csproj.CoreCompileInputs.cache
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\RechnerWPF.exe
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\obj\Debug\RechnerWPF.pdb
