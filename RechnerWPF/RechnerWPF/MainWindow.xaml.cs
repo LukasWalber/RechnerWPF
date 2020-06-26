@@ -207,7 +207,7 @@ namespace RechnerWPF
                 }
 
             Array.Clear(trigMatches, 0, trigMatches.Length);
-
+                eingabe = KlammerRechner(eingabe);
             trigMatches = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
             } while (trigMatches.Length != 0);
@@ -268,61 +268,6 @@ namespace RechnerWPF
         static List<string> KlammerFilter(string eingabe)
         {
             string regexExpression = @"(?<!sin|cos|tan)\(([^(]*?)\)";                                              //inerste Klammer in einer Klammer
-
-            string[] klammern = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
-
-
-            List<string> klammernList = new List<string>();
-            foreach (string k in klammern)
-            {
-                klammernList.Add(k);
-            }
-
-            return klammernList;
-        }
-        static string KlammerRechnerTrig(string eingabe)
-        {
-            double ergebnis;
-            List<double> zahlen;
-            List<string> operatoren;
-            string klammerAufgabe;
-            string ergebnisString;
-            string eingabeOhneKlammern;
-            string zwischenEingabeOhneKlammern = eingabe;
-            List<string> klammerMatch = KlammerFilterTrig(zwischenEingabeOhneKlammern);
-
-            if (klammerMatch.Count == 0)
-            {
-                return eingabe;
-            }
-
-            do
-            {
-                klammerMatch = KlammerFilterTrig(zwischenEingabeOhneKlammern);
-                klammerAufgabe = klammerMatch[0].Substring(1, klammerMatch[0].Length - 2);
-                zahlen = ZahlenFilter(klammerAufgabe);
-                operatoren = OperatorFilter(klammerAufgabe);
-                var punktVorStrichErgebnis = PunktVorStrichRechner(operatoren, zahlen);
-                zahlen = punktVorStrichErgebnis.Item2;
-                operatoren = punktVorStrichErgebnis.Item1;
-
-                ergebnis = RechnerAusfuehren(zahlen, operatoren);
-                ergebnisString = ergebnis.ToString();
-                zwischenEingabeOhneKlammern = zwischenEingabeOhneKlammern.Replace(klammerMatch[0], ergebnisString);
-
-                klammerMatch.Clear();
-
-                klammerMatch = KlammerFilterTrig(zwischenEingabeOhneKlammern);
-            } while (klammerMatch.Count != 0);
-
-            eingabeOhneKlammern = zwischenEingabeOhneKlammern;
-
-            return eingabeOhneKlammern;
-        }
-
-        static List<string> KlammerFilterTrig(string eingabe)
-        {
-            string regexExpression = @"\(([^(]*?)\)";                                              //inerste Klammer in einer Klammer
 
             string[] klammern = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
