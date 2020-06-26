@@ -124,11 +124,11 @@ namespace RechnerWPF
             if (!zwischenwert.Equals(""))
                 {
                     eingabeProzentRechnung = ProzentRechner(zwischenwert);
-                    eingabeTrigonometrieRechnung = trigonometrieRechner(eingabeProzentRechnung);
-                    eingabeKlammerMulti = KlammerMulti(eingabeTrigonometrieRechnung);
+                    eingabeKlammerMulti = KlammerMulti(eingabeProzentRechnung);
                     eingabeOhneKlammern = KlammerRechner(eingabeKlammerMulti);
-                    zahlen = ZahlenFilter(eingabeOhneKlammern);
-                    operatoren = OperatorFilter(eingabeOhneKlammern);
+                    eingabeTrigonometrieRechnung = trigonometrieRechner(eingabeOhneKlammern);
+                    zahlen = ZahlenFilter(eingabeTrigonometrieRechnung);
+                    operatoren = OperatorFilter(eingabeTrigonometrieRechnung);
                     var punktVorStrichErgebnis = PunktVorStrichRechner(operatoren, zahlen);
                     zahlen = punktVorStrichErgebnis.Item2;
                     operatoren = punktVorStrichErgebnis.Item1;
@@ -166,6 +166,7 @@ namespace RechnerWPF
             string regexExpression = @"(sin|cos|tan)\([^(sin|cos|tan)]*?\)";
 
             string trigErgebnis;
+            double replaceString;
             string[] trigMatches = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
             if (trigMatches.Length == 0)
@@ -175,24 +176,32 @@ namespace RechnerWPF
 
             do
             {
-                foreach (string m in trigMatches) { 
-                trigErgebnis = KlammerRechner(m);
+                foreach (string m in trigMatches) {
+
+                    trigErgebnis = KlammerRechner(m);
+                    
                     if(m.Contains("sin"))
                     {
                         trigErgebnis = trigErgebnis.Substring(3);
-                        trigErgebnis = Convert.ToString(Math.Sin(Convert.ToDouble(trigErgebnis)));
+                        trigErgebnis = KlammerRechner(trigErgebnis);
+                        replaceString = Convert.ToDouble(trigErgebnis);
+                        trigErgebnis = Convert.ToString(Math.Sin(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
                     if (m.Contains("cos"))
                     {
                         trigErgebnis = trigErgebnis.Substring(3);
-                        trigErgebnis = Convert.ToString(Math.Cos(Convert.ToDouble(trigErgebnis)));
+                        trigErgebnis = KlammerRechner(trigErgebnis);
+                        replaceString = Convert.ToDouble(trigErgebnis);
+                        trigErgebnis = Convert.ToString(Math.Cos(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
                     if (m.Contains("tan"))
                     {
                         trigErgebnis = trigErgebnis.Substring(3);
-                        trigErgebnis = Convert.ToString(Math.Tan(Convert.ToDouble(trigErgebnis)));
+                        trigErgebnis = KlammerRechner(trigErgebnis);
+                        replaceString = Convert.ToDouble(trigErgebnis);
+                        trigErgebnis = Convert.ToString(Math.Tan(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
                 }
@@ -230,7 +239,7 @@ namespace RechnerWPF
 
         static string KlammerMulti(string eingabe)
         {
-            string regexExpression = @"(?<=\d)\(|\)(?=\d)|\)\(";                                              //Klammer direkt neben zahl(kein operator)
+            string regexExpression = @"(?<=\d)\(|\)(?=\d)|\)\(|\)(?=sin|cos|tan)";                                              //Klammer direkt neben zahl(kein operator)
 
             string[] klammernMulti = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
@@ -243,7 +252,7 @@ namespace RechnerWPF
                 }
                 if (k == ")")
                 {
-                    Regex rgx = new Regex(@"\)(?=\d+)");
+                    Regex rgx = new Regex(@"\)(?=\d+)|\)(?=sin|cos|tan)");
                     eingabe = rgx.Replace(eingabe, ")*", 1);
                 }
                 if (k == ")(")
@@ -257,6 +266,61 @@ namespace RechnerWPF
         }
 
         static List<string> KlammerFilter(string eingabe)
+        {
+            string regexExpression = @"(?<!sin|cos|tan)\(([^(]*?)\)";                                              //inerste Klammer in einer Klammer
+
+            string[] klammern = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
+
+
+            List<string> klammernList = new List<string>();
+            foreach (string k in klammern)
+            {
+                klammernList.Add(k);
+            }
+
+            return klammernList;
+        }
+        static string KlammerRechnerTrig(string eingabe)
+        {
+            double ergebnis;
+            List<double> zahlen;
+            List<string> operatoren;
+            string klammerAufgabe;
+            string ergebnisString;
+            string eingabeOhneKlammern;
+            string zwischenEingabeOhneKlammern = eingabe;
+            List<string> klammerMatch = KlammerFilterTrig(zwischenEingabeOhneKlammern);
+
+            if (klammerMatch.Count == 0)
+            {
+                return eingabe;
+            }
+
+            do
+            {
+                klammerMatch = KlammerFilterTrig(zwischenEingabeOhneKlammern);
+                klammerAufgabe = klammerMatch[0].Substring(1, klammerMatch[0].Length - 2);
+                zahlen = ZahlenFilter(klammerAufgabe);
+                operatoren = OperatorFilter(klammerAufgabe);
+                var punktVorStrichErgebnis = PunktVorStrichRechner(operatoren, zahlen);
+                zahlen = punktVorStrichErgebnis.Item2;
+                operatoren = punktVorStrichErgebnis.Item1;
+
+                ergebnis = RechnerAusfuehren(zahlen, operatoren);
+                ergebnisString = ergebnis.ToString();
+                zwischenEingabeOhneKlammern = zwischenEingabeOhneKlammern.Replace(klammerMatch[0], ergebnisString);
+
+                klammerMatch.Clear();
+
+                klammerMatch = KlammerFilterTrig(zwischenEingabeOhneKlammern);
+            } while (klammerMatch.Count != 0);
+
+            eingabeOhneKlammern = zwischenEingabeOhneKlammern;
+
+            return eingabeOhneKlammern;
+        }
+
+        static List<string> KlammerFilterTrig(string eingabe)
         {
             string regexExpression = @"\(([^(]*?)\)";                                              //inerste Klammer in einer Klammer
 
@@ -349,8 +413,6 @@ namespace RechnerWPF
             int geteiltzeichenIndex;
             int hochzeichenIndex;
 
-            multiplikationszeichenIndex = operatoren.IndexOf("*");
-            geteiltzeichenIndex = operatoren.IndexOf("/");
             hochzeichenIndex = operatoren.IndexOf("^");
 
             while (!hochzeichenIndex.Equals(-1))
@@ -363,6 +425,8 @@ namespace RechnerWPF
                 hochzeichenIndex = operatoren.IndexOf("^");
             }
 
+            multiplikationszeichenIndex = operatoren.IndexOf("*");
+            geteiltzeichenIndex = operatoren.IndexOf("/");
 
             while (!multiplikationszeichenIndex.Equals(-1) || !geteiltzeichenIndex.Equals(-1))
             {
