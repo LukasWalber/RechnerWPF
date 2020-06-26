@@ -113,6 +113,10 @@ namespace RechnerWPF
         {
             EingabeHinzufügen(",");
         }
+        private void ButtonWurzel_Click(object sender, RoutedEventArgs e)
+        {
+            EingabeHinzufügen("√(");
+        }
         private void ButtonReset_Click(object sender, RoutedEventArgs e)
         {
             zwischenwert = "";
@@ -163,7 +167,7 @@ namespace RechnerWPF
         }
         private string trigonometrieRechner(string eingabe)
         {
-            string regexExpression = @"(sin|cos|tan)\([^(sin|cos|tan)]*?\)";
+            string regexExpression = @"(sin|cos|tan|√)\([^(sin|cos|tan|√)]*?\)";
 
             string trigErgebnis;
             double replaceString;
@@ -204,6 +208,14 @@ namespace RechnerWPF
                         trigErgebnis = Convert.ToString(Math.Tan(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
+                    if (m.Contains("√"))
+                    {
+                        trigErgebnis = trigErgebnis.Substring(1);
+                        trigErgebnis = KlammerRechner(trigErgebnis);
+                        replaceString = Convert.ToDouble(trigErgebnis);
+                        trigErgebnis = Convert.ToString(Math.Sqrt(replaceString));
+                        eingabe = eingabe.Replace(m, trigErgebnis);
+                    }
                 }
 
             Array.Clear(trigMatches, 0, trigMatches.Length);
@@ -239,7 +251,7 @@ namespace RechnerWPF
 
         static string KlammerMulti(string eingabe)
         {
-            string regexExpression = @"(?<=\d)\(|\)(?=\d)|\)\(|\)(?=sin|cos|tan)";                                              //Klammer direkt neben zahl(kein operator)
+            string regexExpression = @"(?<=\d)\(|\)(?=\d)|\)\(|\)(?=sin|cos|tan|√)";                                              //Klammer direkt neben zahl(kein operator)
 
             string[] klammernMulti = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
@@ -252,7 +264,7 @@ namespace RechnerWPF
                 }
                 if (k == ")")
                 {
-                    Regex rgx = new Regex(@"\)(?=\d+)|\)(?=sin|cos|tan)");
+                    Regex rgx = new Regex(@"\)(?=\d+)|\)(?=sin|cos|tan|√)");
                     eingabe = rgx.Replace(eingabe, ")*", 1);
                 }
                 if (k == ")(")
@@ -267,7 +279,7 @@ namespace RechnerWPF
 
         static List<string> KlammerFilter(string eingabe)
         {
-            string regexExpression = @"(?<!sin|cos|tan)\(([^(]*?)\)";                                              //inerste Klammer in einer Klammer
+            string regexExpression = @"(?<!sin|cos|tan|√)\(([^(]*?)\)";                                              //inerste Klammer in einer Klammer
 
             string[] klammern = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
