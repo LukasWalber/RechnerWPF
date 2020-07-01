@@ -1,0 +1,14 @@
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\bin\Release\RechnerWPF.exe.config
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\bin\Release\RechnerWPF.exe
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\bin\Release\RechnerWPF.pdb
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\MainWindow.g.cs
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\App.g.cs
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\RechnerWPF_MarkupCompile.cache
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\RechnerWPF_MarkupCompile.lref
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\MainWindow.baml
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\RechnerWPF.g.resources
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\RechnerWPF.Properties.Resources.resources
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\RechnerWPF.csproj.GenerateResource.cache
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\RechnerWPF.csproj.CoreCompileInputs.cache
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\RechnerWPF.exe
+C:\Users\lukas.walber\source\repos\RechnerWPF\RechnerWPF\RechnerWPF\obj\Release\RechnerWPF.pdb

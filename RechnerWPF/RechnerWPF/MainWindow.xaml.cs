@@ -9,13 +9,16 @@ namespace RechnerWPF
 
     public partial class MainWindow : Window
     {
-        string zwischenwert = "";
+        string zwischenwert = "((7-8)/5)%(7(6-4%)%)%";
         string eingabeKlammerMulti;
         string eingabeProzentRechnung;
         string eingabeTrigonometrieRechnung;
         string eingabeOhneKlammern;
         string eingabepi_e;
+        string klammerEinfügenString;
         string ergebnis = "";
+        string ans = "";
+        int klammerOffenCount = 0;
         List<double> zahlen;
         List<string> operatoren;
 
@@ -84,10 +87,12 @@ namespace RechnerWPF
         }
         private void ButtonKlammerAuf_Click(object sender, RoutedEventArgs e)
         {
+            klammerOffenCount++;
             EingabeHinzufügen("(");
         }
         private void ButtonKlammerZu_Click(object sender, RoutedEventArgs e)
         {
+            klammerOffenCount--;
             EingabeHinzufügen(")");
         }
         private void ButtonHoch_Click(object sender, RoutedEventArgs e)
@@ -100,14 +105,17 @@ namespace RechnerWPF
         }
         private void ButtonCos_Click(object sender, RoutedEventArgs e)
         {
+            klammerOffenCount++;
             EingabeHinzufügen("cos(");
         }
         private void ButtonSin_Click(object sender, RoutedEventArgs e)
         {
+            klammerOffenCount++;
             EingabeHinzufügen("sin(");
         }
         private void ButtonTan_Click(object sender, RoutedEventArgs e)
         {
+            klammerOffenCount++;
             EingabeHinzufügen("tan(");
         }
         private void ButtonKomma_Click(object sender, RoutedEventArgs e)
@@ -116,14 +124,17 @@ namespace RechnerWPF
         }
         private void ButtonWurzel_Click(object sender, RoutedEventArgs e)
         {
+            klammerOffenCount++;
             EingabeHinzufügen("√(");
         }
         private void Buttonln_Click(object sender, RoutedEventArgs e)
         {
+            klammerOffenCount++;
             EingabeHinzufügen("ln(");
         }
         private void Buttonlog_Click(object sender, RoutedEventArgs e)
         {
+            klammerOffenCount++;
             EingabeHinzufügen("log(");
         }
         private void Buttone_Click(object sender, RoutedEventArgs e)
@@ -138,34 +149,61 @@ namespace RechnerWPF
         {
             zwischenwert = "";
             ergebnis = "";
+            klammerOffenCount = 0;
+            ans = "";
             textBlockAusgabe.Text = zwischenwert;
+        }
+        private void Buttonans_Click(object sender, RoutedEventArgs e)
+        {
+            EingabeHinzufügen(ans);
         }
         private void ButtonGleich_Click(object sender, RoutedEventArgs e)
         {
             if (!zwischenwert.Equals(""))
                 {
-                    eingabepi_e = replacer(zwischenwert);
-                    eingabeProzentRechnung = ProzentRechner(eingabepi_e);
-                    eingabeKlammerMulti = KlammerMulti(eingabeProzentRechnung);
-                    eingabeOhneKlammern = KlammerRechner(eingabeKlammerMulti);
-                    eingabeTrigonometrieRechnung = trigonometrieRechner(eingabeOhneKlammern);
-                    zahlen = ZahlenFilter(eingabeTrigonometrieRechnung);
-                    operatoren = OperatorFilter(eingabeTrigonometrieRechnung);
-                    var punktVorStrichErgebnis = PunktVorStrichRechner(operatoren, zahlen);
-                    zahlen = punktVorStrichErgebnis.Item2;
-                    operatoren = punktVorStrichErgebnis.Item1;
+                    try
+                    {
+                        klammerEinfügenString = klammernAnhängen(zwischenwert);
+                        eingabepi_e = replacer(klammerEinfügenString);
+                        eingabeProzentRechnung = ProzentRechner(eingabepi_e);
+                        eingabeKlammerMulti = KlammerMulti(eingabeProzentRechnung);
+                        eingabeOhneKlammern = KlammerRechner(eingabeKlammerMulti);
+                        eingabeTrigonometrieRechnung = trigonometrieRechner(eingabeOhneKlammern);
+                        eingabeProzentRechnung = ProzentRechner(eingabeTrigonometrieRechnung);
+                        zahlen = ZahlenFilter(eingabeProzentRechnung);
+                        operatoren = OperatorFilter(eingabeProzentRechnung);
+                        var punktVorStrichErgebnis = PunktVorStrichRechner(operatoren, zahlen);
+                        zahlen = punktVorStrichErgebnis.Item2;
+                        operatoren = punktVorStrichErgebnis.Item1;
 
-
-                    ergebnis = RechnerAusfuehren(zahlen, operatoren).ToString("G");
+                        ergebnis = RechnerAusfuehren(zahlen, operatoren).ToString("G");
+                        ans = ergebnis;
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        ergebnis = "Error";
+                        ans = "";
+                    }
                 }
+            klammerOffenCount = 0;
             zwischenwert = "";
             textBlockAusgabe.Text = ergebnis;
         }
 
+        private string klammernAnhängen(string eingabe)
+        {
+            for(int i = 0; i < klammerOffenCount; i++)
+            {
+                eingabe += ")";
+            }
+
+            return eingabe;
+        }
+
         private string replacer(string eingabe)
         {
-            eingabe = eingabe.Replace("π", "3,14159265359");
-            eingabe = eingabe.Replace("e", "2,71828182846");
+            eingabe = eingabe.Replace("π", "3,14159265358979323");
+            eingabe = eingabe.Replace("e", "2,71828182845904524");
 
             return eingabe;
         }
@@ -176,7 +214,9 @@ namespace RechnerWPF
             {
                 zwischenwert = zwischenwert + eingabe;
 
-                textBlockAusgabe.Text = zwischenwert;
+                klammerEinfügenString = klammernAnhängen(zwischenwert);
+
+                textBlockAusgabe.Text = klammerEinfügenString;
             } 
             else if (eingabe.Equals("+") | eingabe.Equals("-") | eingabe.Equals("*") | eingabe.Equals("/") | eingabe.Equals("^"))
             {
@@ -188,7 +228,8 @@ namespace RechnerWPF
                 ergebnis = "";
                 zwischenwert = zwischenwert + eingabe;
             }
-            textBlockAusgabe.Text = zwischenwert;
+            klammerEinfügenString = klammernAnhängen(zwischenwert);
+            textBlockAusgabe.Text = klammerEinfügenString;
         }
         private string trigonometrieRechner(string eingabe)
         {
@@ -209,7 +250,7 @@ namespace RechnerWPF
 
                     trigErgebnis = KlammerRechner(m);
                     
-                    if(m.Contains("sin"))
+                    if (m.Contains("sin"))
                     {
                         trigErgebnis = trigErgebnis.Substring(3);
                         trigErgebnis = KlammerRechner(trigErgebnis);
@@ -260,7 +301,7 @@ namespace RechnerWPF
                 }
 
             Array.Clear(trigMatches, 0, trigMatches.Length);
-                eingabe = KlammerRechner(eingabe);
+            eingabe = KlammerRechner(eingabe);
             trigMatches = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
             } while (trigMatches.Length != 0);
@@ -270,7 +311,7 @@ namespace RechnerWPF
 
         static string ProzentRechner(string eingabe)
         {
-            string regexExpression = @"((^[-]\d +,\d +[\+\-\/\*\^](\d +,\d +|\d +)[%])| ^[-]\d +[\+\-\/\*\^](\d +,\d +|\d +)[%])| (\d +,\d +[\+\-\/\*\^])(\d +,\d +|\d +)[%]|(\d+[\+\-\/\*\^])(\d+,\d+|\d+)[%]|((?<=[\+\-\/\*\^\(])[-] (\d+,\d+[\+\-\/\*\^] (\d+,\d+|\d+)[%]|\d+[\+\-\/\*\^] (\d+,\d+|\d+)[%]))";   //zahl operator zahl und % zeichen match
+            string regexExpression = @"((^[-]\d+,\d+[\+\-\/\*\^](\d+,\d+|\d+)[%])|^[-]\d+[\+\-\/\*\^](\d+\d+|\d+)[%])|(\d+,\d+[\+\-\/\*\^])(\d+,\d+|\d+)[%]|(\d+[\+\-\/\*\^])(\d+,\d+|\d+)[%]|((?<=[\+\-\/\*\^\(])[-](\d+,\d+[\+\-\/\*\^] (\d+,\d+|\d+)[%]|\d+[\+\-\/\*\^](\d+,\d+|\d+)[%]))";   //zahl operator zahl und % zeichen match
             List<double> prozentEingabe;
             List<string> Aufgabenoperator;
             double zwischenergebnis;
@@ -281,18 +322,37 @@ namespace RechnerWPF
             {
                 prozentEingabe = ZahlenFilter(s);
                 Aufgabenoperator = OperatorFilter(s);
-                prozentEingabe[1] =  (prozentEingabe[1] / 100) * prozentEingabe[0];
-                zwischenergebnis = RechnerAusfuehren(prozentEingabe, Aufgabenoperator);
-                eingabe = eingabe.Replace(s, zwischenergebnis.ToString("G"));
+                if(Aufgabenoperator[0] == "+" | Aufgabenoperator[0] == "-")
+                {
+                    prozentEingabe[1] =  (prozentEingabe[1] / 100) * prozentEingabe[0];
+                    zwischenergebnis = RechnerAusfuehren(prozentEingabe, Aufgabenoperator);
+                    eingabe = eingabe.Replace(s, zwischenergebnis.ToString("G"));
+                }
+                else if(Aufgabenoperator[0] != "^")
+                {
+                    prozentEingabe[1] = (prozentEingabe[1] / 100);
+                    zwischenergebnis = RechnerAusfuehren(prozentEingabe, Aufgabenoperator);
+                    eingabe = eingabe.Replace(s, zwischenergebnis.ToString("G"));
+                }
             }
+            string regexExpression2 = @"(?!\+|\-|\/|\*|\^)(\d+,\d+|\d+)[%]";                                                                                               //alle zahlen mit % am ende
+            string[] ProzentAufgaben2 = Regex.Matches(eingabe, regexExpression2).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
+            foreach (string s in ProzentAufgaben2)
+            {
+                prozentEingabe = ZahlenFilter(s);
 
+                prozentEingabe[0] = prozentEingabe[0] / 100;
+                eingabe = eingabe.Replace(s, prozentEingabe[0].ToString("G"));
+                
+
+            }
             return eingabe;
         }
 
         static string KlammerMulti(string eingabe)
         {
-            string regexExpression = @"(?<=\d)\(|\)(?=\d)|\)\(|\)(?=sin|cos|tan|√|ln|log)";                                              //Klammer direkt neben zahl(kein operator)
+            string regexExpression = @"(?<=\d)\(|\)(?=\d)|\)\(|\)(?=sin|cos|tan|√|ln|log)|(?<=\d)(?=sin|cos|tan|√|ln|log)|\%\(";                                              //Klammer direkt neben zahl(kein operator)
 
             string[] klammernMulti = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
@@ -312,6 +372,11 @@ namespace RechnerWPF
                 {
                     Regex rgx = new Regex(@"\)\(+?");
                     eingabe = rgx.Replace(eingabe, ")*(", 1);
+                }
+                if (k == "")
+                {
+                    Regex rgx = new Regex(@"(?<=\d)(?=sin|cos|tan|√|ln|log)");
+                    eingabe = rgx.Replace(eingabe, "*", 1);
                 }
             }
 
@@ -394,7 +459,7 @@ namespace RechnerWPF
                 ergebnis = RechnerAusfuehren(zahlen, operatoren);
                 ergebnisString = ergebnis.ToString();
                 zwischenEingabeOhneKlammern = zwischenEingabeOhneKlammern.Replace(klammerMatch[0], ergebnisString);
-
+                zwischenEingabeOhneKlammern = ProzentRechner(zwischenEingabeOhneKlammern);
                 klammerMatch.Clear();
 
                 klammerMatch = KlammerFilter(zwischenEingabeOhneKlammern);
@@ -485,10 +550,16 @@ namespace RechnerWPF
             int operatorenZahl = operatoren.Count;
             double zwischenergebnis;
 
+
+            if (zahlen.Count == 0)
+            {
+                throw new ArgumentOutOfRangeException("error");
+            }
             if (operatorenZahl == 0)
             {
                 return zahlen[0];
             }
+
 
             zwischenergebnis = RechnerSimpel(zahlen[0], zahlen[1], operatoren[0]);
 
