@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RechnerWPF"
         mc:Ignorable="d"
-        Title="Calculator" Height="450" Width="420">
+        Title="Calculator" Height="450" Width="500">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100*"/>
@@ -52,6 +52,7 @@
         <Button Content="log" Grid.Column="0" Grid.Row="1" Click="Buttonlog_Click"/>
         <Button Content="e" Grid.Column="0" Grid.Row="3" Click="Buttone_Click"/>
         <Button Content="π" Grid.Column="0" Grid.Row="4" Click="Buttonpi_Click"/>
+        <Button Content="Ans" Grid.Column="0" Grid.Row="5" Click="Buttonans_Click"/>
         <TextBlock x:Name="textBlockAusgabe" Text="0" Grid.ColumnSpan="5" FontSize="40" />
     </Grid>
 </Window>
