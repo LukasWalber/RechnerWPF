@@ -378,6 +378,11 @@ namespace RechnerWPF
                     Regex rgx = new Regex(@"(?<=\d)(?=sin|cos|tan|√|ln|log)");
                     eingabe = rgx.Replace(eingabe, "*", 1);
                 }
+                if (k == "%(")
+                {
+                    Regex rgx = new Regex(@"\%\(");
+                    eingabe = rgx.Replace(eingabe, "%*(", 1);
+                }
             }
 
             return eingabe;
@@ -401,7 +406,7 @@ namespace RechnerWPF
 
         static List<double> ZahlenFilter(string eingabe)
         {
-            string regexExpression = @"((^[-]\d+,\d+)|^[-]\d+)|(\d+,\d+)|(\d+)|((?<=[\+\-\/\*\^\(])[-](\d+,\d+|\d+))";                                              //alle zahlen, mit oder ohne komma und negative zahlen
+            string regexExpression = @"(^[-]\d+,\d+(E\d+|E\-\d+)|^[-]\d+(E\d+|E\-\d+))|(\d+,\d+(E\d+|E\-\d+))|(\d+(E\d+|E\-\d+))|((?<=[\+\-\/\*\^\(])[-](\d+,\d+(E\d+|E\-\d+)|\d+(E\d+|E\-\d+)))|((^[-]\d+,\d+)|^[-]\d+)|(\d+,\d+)|(\d+)|((?<=[\+\-\/\*\^\(])[-](\d+,\d+|\d+))";                                              //alle zahlen, mit oder ohne komma und negative zahlen
 
             var zahlen = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => double.Parse(m.Value)).ToArray();
 
@@ -450,6 +455,7 @@ namespace RechnerWPF
             {
                 klammerMatch = KlammerFilter(zwischenEingabeOhneKlammern);
                 klammerAufgabe = klammerMatch[0].Substring(1, klammerMatch[0].Length - 2);
+                zwischenEingabeOhneKlammern = ProzentRechner(zwischenEingabeOhneKlammern);
                 zahlen = ZahlenFilter(klammerAufgabe);
                 operatoren = OperatorFilter(klammerAufgabe);
                 var punktVorStrichErgebnis = PunktVorStrichRechner(operatoren, zahlen);
@@ -459,7 +465,6 @@ namespace RechnerWPF
                 ergebnis = RechnerAusfuehren(zahlen, operatoren);
                 ergebnisString = ergebnis.ToString();
                 zwischenEingabeOhneKlammern = zwischenEingabeOhneKlammern.Replace(klammerMatch[0], ergebnisString);
-                zwischenEingabeOhneKlammern = ProzentRechner(zwischenEingabeOhneKlammern);
                 klammerMatch.Clear();
 
                 klammerMatch = KlammerFilter(zwischenEingabeOhneKlammern);
