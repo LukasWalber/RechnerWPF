@@ -424,7 +424,7 @@ namespace RechnerWPF
 
         static List<string> OperatorFilter(string eingabe)
         {
-            string regexExpression = @"([\+\-\/\*\^]|md)(?=[\+\-\/\*\^]|md)|((?<=\d+)([\+\-\/\*\^]|md)(?=\d+))|([\+\-\/\*\^]|md)(?=\()|(?<=\))([\+\-\/\*\^]|md)";                                             //alle operatoren zwischen 2 zahlen, neben klammer auf oder klammer zu, oder den ersten von zwei aufeinanderfolgenden operatoren
+            string regexExpression = @"(?<![\+\-\/\*\^]|md)([\+\-\/\*\^]|md)|((?<=\d+)([\+\-\/\*\^]|md)(?=\d+))|([\+\-\/\*\^]|md)(?=\()|(?<=\))([\+\-\/\*\^]|md)";                                             //alle operatoren zwischen 2 zahlen, neben klammer auf oder klammer zu, oder den ersten von zwei aufeinanderfolgenden operatoren
 
             string[] operatoren = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
