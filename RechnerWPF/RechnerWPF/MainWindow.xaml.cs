@@ -145,12 +145,15 @@ namespace RechnerWPF
         {
             EingabeHinzufügen("π");
         }
+        private void Buttonmd_Click(object sender, RoutedEventArgs e)
+        {
+            EingabeHinzufügen("md");
+        }
         private void ButtonReset_Click(object sender, RoutedEventArgs e)
         {
             zwischenwert = "";
             ergebnis = "";
             klammerOffenCount = 0;
-            ans = "";
             textBlockAusgabe.Text = zwischenwert;
         }
         private void Buttonans_Click(object sender, RoutedEventArgs e)
@@ -218,7 +221,7 @@ namespace RechnerWPF
 
                 textBlockAusgabe.Text = klammerEinfügenString;
             } 
-            else if (eingabe.Equals("+") | eingabe.Equals("-") | eingabe.Equals("*") | eingabe.Equals("/") | eingabe.Equals("^"))
+            else if (eingabe.Equals("+") | eingabe.Equals("-") | eingabe.Equals("*") | eingabe.Equals("/") | eingabe.Equals("^") | eingabe.Equals("md"))
             {
                 zwischenwert = ergebnis + eingabe;
                 ergebnis = "";
@@ -311,7 +314,7 @@ namespace RechnerWPF
 
         static string ProzentRechner(string eingabe)
         {
-            string regexExpression = @"((^[-]\d+,\d+[\+\-\/\*\^](\d+,\d+|\d+)[%])|^[-]\d+[\+\-\/\*\^](\d+\d+|\d+)[%])|(\d+,\d+[\+\-\/\*\^])(\d+,\d+|\d+)[%]|(\d+[\+\-\/\*\^])(\d+,\d+|\d+)[%]|((?<=[\+\-\/\*\^\(])[-](\d+,\d+[\+\-\/\*\^] (\d+,\d+|\d+)[%]|\d+[\+\-\/\*\^](\d+,\d+|\d+)[%]))";   //zahl operator zahl und % zeichen match
+            string regexExpression = @"((^[-]\d+,\d+([\+\-\/\*\^]|md)(\d+,\d+|\d+)[%])|^[-]\d+([\+\-\/\*\^]|md)(\d+\d+|\d+)[%])|(\d+,\d+[\+\-\/\*\^])(\d+,\d+|\d+)[%]|(\d+([\+\-\/\*\^]|md))(\d+,\d+|\d+)[%]|((?<=[\+\-\/\*\^\(]|md)[-](\d+,\d+([\+\-\/\*\^]|md) (\d+,\d+|\d+)[%]|\d+([\+\-\/\*\^]|md)(\d+,\d+|\d+)[%]))";   //zahl operator zahl und % zeichen match
             List<double> prozentEingabe;
             List<string> Aufgabenoperator;
             double zwischenergebnis;
@@ -335,7 +338,7 @@ namespace RechnerWPF
                     eingabe = eingabe.Replace(s, zwischenergebnis.ToString("G"));
                 }
             }
-            string regexExpression2 = @"(?!\+|\-|\/|\*|\^)(\d+,\d+|\d+)[%]";                                                                                               //alle zahlen mit % am ende
+            string regexExpression2 = @"(?!\+|\-|\/|\*|\^|md)(\d+,\d+|\d+)[%]";                                                                                               //alle zahlen mit % am ende
             string[] ProzentAufgaben2 = Regex.Matches(eingabe, regexExpression2).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
             foreach (string s in ProzentAufgaben2)
@@ -406,7 +409,7 @@ namespace RechnerWPF
 
         static List<double> ZahlenFilter(string eingabe)
         {
-            string regexExpression = @"(^[-]\d+,\d+(E\d+|E\-\d+)|^[-]\d+(E\d+|E\-\d+))|(\d+,\d+(E\d+|E\-\d+))|(\d+(E\d+|E\-\d+))|((?<=[\+\-\/\*\^\(])[-](\d+,\d+(E\d+|E\-\d+)|\d+(E\d+|E\-\d+)))|((^[-]\d+,\d+)|^[-]\d+)|(\d+,\d+)|(\d+)|((?<=[\+\-\/\*\^\(])[-](\d+,\d+|\d+))";                                              //alle zahlen, mit oder ohne komma und negative zahlen
+            string regexExpression = @"(^[-]\d+,\d+(E\d+|E\-\d+)|^[-]\d+(E\d+|E\-\d+))|(\d+,\d+(E\d+|E\-\d+))|(\d+(E\d+|E\-\d+))|((?<=[\+\-\/\*\^\(]|md)[-](\d+,\d+(E\d+|E\-\d+)|\d+(E\d+|E\-\d+)))|((^[-]\d+,\d+)|^[-]\d+)|(\d+,\d+)|(\d+)|((?<=[\+\-\/\*\^\(]|md)[-](\d+,\d+|\d+))";                                              //alle zahlen, mit oder ohne komma und negative zahlen
 
             var zahlen = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => double.Parse(m.Value)).ToArray();
 
@@ -421,7 +424,7 @@ namespace RechnerWPF
 
         static List<string> OperatorFilter(string eingabe)
         {
-            string regexExpression = @"([\+\-\/\*\^])(?=[\+\-\/\*\^])|((?<=\d+)[\+\-\/\*\^](?=\d+))|[\+\-\/\*\^](?=\()|(?<=\))[\+\-\/\*\^]";                                              //alle operatoren zwischen 2 zahlen, neben klammer auf oder klammer zu, oder den ersten von zwei aufeinanderfolgenden operatoren
+            string regexExpression = @"([\+\-\/\*\^]|md)(?=[\+\-\/\*\^]|md)|((?<=\d+)([\+\-\/\*\^]|md)(?=\d+))|([\+\-\/\*\^]|md)(?=\()|(?<=\))([\+\-\/\*\^]|md)";                                             //alle operatoren zwischen 2 zahlen, neben klammer auf oder klammer zu, oder den ersten von zwei aufeinanderfolgenden operatoren
 
             string[] operatoren = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
@@ -477,9 +480,10 @@ namespace RechnerWPF
 
         static Tuple<List<string>, List<double>> PunktVorStrichRechner(List<string> operatoren, List<double> zahlen)
         {
+            int hochzeichenIndex;
             int multiplikationszeichenIndex;
             int geteiltzeichenIndex;
-            int hochzeichenIndex;
+            int mdzeichenIndex;
 
             hochzeichenIndex = operatoren.IndexOf("^");
 
@@ -495,25 +499,34 @@ namespace RechnerWPF
 
             multiplikationszeichenIndex = operatoren.IndexOf("*");
             geteiltzeichenIndex = operatoren.IndexOf("/");
+            mdzeichenIndex = operatoren.IndexOf("md");
 
-            while (!multiplikationszeichenIndex.Equals(-1) || !geteiltzeichenIndex.Equals(-1))
+            while (!multiplikationszeichenIndex.Equals(-1) || !geteiltzeichenIndex.Equals(-1) || !mdzeichenIndex.Equals(-1))
             {
-                if ((multiplikationszeichenIndex < geteiltzeichenIndex && multiplikationszeichenIndex != -1) ^ geteiltzeichenIndex.Equals(-1))
+                if (((multiplikationszeichenIndex < geteiltzeichenIndex && multiplikationszeichenIndex != -1) || geteiltzeichenIndex.Equals(-1)) && ((multiplikationszeichenIndex < mdzeichenIndex && multiplikationszeichenIndex != -1) || mdzeichenIndex.Equals(-1)))
                 {
                     zahlen[multiplikationszeichenIndex] = RechnerSimpel(zahlen[multiplikationszeichenIndex], zahlen[multiplikationszeichenIndex + 1], operatoren[multiplikationszeichenIndex]);
                     zahlen.RemoveAt(multiplikationszeichenIndex + 1);
                     operatoren.RemoveAt(multiplikationszeichenIndex);
                 }
 
-                if ((geteiltzeichenIndex < multiplikationszeichenIndex && geteiltzeichenIndex != -1) ^ multiplikationszeichenIndex.Equals(-1))
+                if (((geteiltzeichenIndex < multiplikationszeichenIndex && geteiltzeichenIndex != -1) || multiplikationszeichenIndex.Equals(-1)) && ((geteiltzeichenIndex < mdzeichenIndex && geteiltzeichenIndex != -1) || mdzeichenIndex.Equals(-1)))
                 {
                     zahlen[geteiltzeichenIndex] = RechnerSimpel(zahlen[geteiltzeichenIndex], zahlen[geteiltzeichenIndex + 1], operatoren[geteiltzeichenIndex]);
                     zahlen.RemoveAt(geteiltzeichenIndex + 1);
                     operatoren.RemoveAt(geteiltzeichenIndex);
                 }
 
+                if (((mdzeichenIndex < multiplikationszeichenIndex && mdzeichenIndex != -1) || multiplikationszeichenIndex.Equals(-1)) && ((mdzeichenIndex < geteiltzeichenIndex && mdzeichenIndex != -1) || geteiltzeichenIndex.Equals(-1)))
+                {
+                    zahlen[mdzeichenIndex] = RechnerSimpel(zahlen[mdzeichenIndex], zahlen[mdzeichenIndex + 1], operatoren[mdzeichenIndex]);
+                    zahlen.RemoveAt(mdzeichenIndex + 1);
+                    operatoren.RemoveAt(mdzeichenIndex);
+                }
+
                 multiplikationszeichenIndex = operatoren.IndexOf("*");
                 geteiltzeichenIndex = operatoren.IndexOf("/");
+                mdzeichenIndex = operatoren.IndexOf("md");
             }
 
             var tupleReturn = new Tuple<List<string>, List<double>>(operatoren, zahlen);
@@ -539,6 +552,10 @@ namespace RechnerWPF
                 case "/":
 
                     return zahl1 / zahl2;
+
+                case "md":
+
+                    return zahl1 % zahl2;
 
                 case "^":
 
