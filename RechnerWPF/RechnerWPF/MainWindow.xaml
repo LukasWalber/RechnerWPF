@@ -39,12 +39,13 @@
         <Button Content="-" Grid.Column="5" Grid.Row="4" Click="ButtonMinus_Click"/>
         <Button Content="+" Grid.Column="5" Grid.Row="5" Click="ButtonPlus_Click"/>
         <Button Content="=" Grid.Column="4" Grid.Row="5" Click="ButtonGleich_Click"/>
-        <Button Content="(" Grid.Column="2" Grid.Row="1" Click="ButtonKlammerAuf_Click"/>
-        <Button Content=")" Grid.Column="3" Grid.Row="1" Click="ButtonKlammerZu_Click"/>
+        <Button Content="(" Grid.Column="3" Grid.Row="1" Click="ButtonKlammerAuf_Click"/>
+        <Button Content=")" Grid.Column="4" Grid.Row="1" Click="ButtonKlammerZu_Click"/>
         <Button Content="," Grid.Column="3" Grid.Row="5" Click="ButtonKomma_Click"/>
-        <Button Content="AC" Grid.Column="5" Grid.Row="1" Click="ButtonReset_Click"/>
-        <Button Content="^" Grid.Column="1" Grid.Row="1" Click="ButtonHoch_Click"/>
-        <Button Content="%" Grid.Column="4" Grid.Row="1" Click="ButtonProzent_Click"/>
+        <Button Content="AC" Grid.Column="6" Grid.Row="1" Click="ButtonReset_Click"/>
+        <Button Content="^" Grid.Column="2" Grid.Row="1" Click="ButtonHoch_Click"/>
+        <Button Content="!" Grid.Column="1" Grid.Row="1" Click="ButtonFak_Click"/>
+        <Button Content="%" Grid.Column="5" Grid.Row="1" Click="ButtonProzent_Click"/>
         <Button Content="cos(" Grid.Column="1" Grid.Row="4" Click="ButtonCos_Click"/>
         <Button Content="sin(" Grid.Column="1" Grid.Row="3" Click="ButtonSin_Click"/>
         <Button Content="tan(" Grid.Column="1" Grid.Row="5" Click="ButtonTan_Click"/>
