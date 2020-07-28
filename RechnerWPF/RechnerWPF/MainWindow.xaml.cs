@@ -118,6 +118,21 @@ namespace RechnerWPF
             klammerOffenCount++;
             EingabeHinzufügen("tan(");
         }
+        private void ButtonArctan_Click(object sender, RoutedEventArgs e)
+        {
+            klammerOffenCount++;
+            EingabeHinzufügen("arctan(");
+        }
+        private void ButtonArccos_Click(object sender, RoutedEventArgs e)
+        {
+            klammerOffenCount++;
+            EingabeHinzufügen("arccos(");
+        }
+        private void ButtonArcsin_Click(object sender, RoutedEventArgs e)
+        {
+            klammerOffenCount++;
+            EingabeHinzufügen("arcsin(");
+        }
         private void ButtonKomma_Click(object sender, RoutedEventArgs e)
         {
             EingabeHinzufügen(",");
@@ -240,7 +255,7 @@ namespace RechnerWPF
         }
         private static string trigonometrieRechner(string eingabe)
         {
-            string regexExpression = @"(sin|cos|tan|√|ln|log)\([^(sin|cos|tan|√|ln|log)]*?\)";
+            string regexExpression = @"(sin|cos|tan|√|ln|log|arcsin|arccos|arctan)\([^(sin|cos|tan|√|ln|log|arcsin|arccos|arctan)]*?\)";
 
             string trigErgebnis;
             double replaceString;
@@ -257,7 +272,15 @@ namespace RechnerWPF
 
                     trigErgebnis = KlammerRechner(m);
                     
-                    if (m.Contains("sin"))
+                    if (m.Contains("arcsin"))
+                    {
+                        trigErgebnis = trigErgebnis.Substring(6);
+                        trigErgebnis = KlammerRechner(trigErgebnis);
+                        replaceString = Convert.ToDouble(trigErgebnis);
+                        trigErgebnis = Convert.ToString(Math.Asin(replaceString));
+                        eingabe = eingabe.Replace(m, trigErgebnis);
+                    }
+                    else if (m.Contains("sin"))
                     {
                         trigErgebnis = trigErgebnis.Substring(3);
                         trigErgebnis = KlammerRechner(trigErgebnis);
@@ -265,7 +288,16 @@ namespace RechnerWPF
                         trigErgebnis = Convert.ToString(Math.Sin(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
-                    if (m.Contains("cos"))
+
+                    if (m.Contains("arccos"))
+                    {
+                        trigErgebnis = trigErgebnis.Substring(6);
+                        trigErgebnis = KlammerRechner(trigErgebnis);
+                        replaceString = Convert.ToDouble(trigErgebnis);
+                        trigErgebnis = Convert.ToString(Math.Acos(replaceString));
+                        eingabe = eingabe.Replace(m, trigErgebnis);
+                    }
+                    else if (m.Contains("cos"))
                     {
                         trigErgebnis = trigErgebnis.Substring(3);
                         trigErgebnis = KlammerRechner(trigErgebnis);
@@ -273,7 +305,16 @@ namespace RechnerWPF
                         trigErgebnis = Convert.ToString(Math.Cos(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
-                    if (m.Contains("tan"))
+
+                    if (m.Contains("arctan"))
+                    {
+                        trigErgebnis = trigErgebnis.Substring(6);
+                        trigErgebnis = KlammerRechner(trigErgebnis);
+                        replaceString = Convert.ToDouble(trigErgebnis);
+                        trigErgebnis = Convert.ToString(Math.Atan(replaceString));
+                        eingabe = eingabe.Replace(m, trigErgebnis);
+                    }
+                    else if (m.Contains("tan"))
                     {
                         trigErgebnis = trigErgebnis.Substring(3);
                         trigErgebnis = KlammerRechner(trigErgebnis);
@@ -281,6 +322,7 @@ namespace RechnerWPF
                         trigErgebnis = Convert.ToString(Math.Tan(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
+
                     if (m.Contains("√"))
                     {
                         trigErgebnis = trigErgebnis.Substring(1);
@@ -359,7 +401,7 @@ namespace RechnerWPF
 
         static string KlammerMulti(string eingabe)
         {
-            string regexExpression = @"(?<=\d|\!)\(|\)(?=\d)|\)\(|\)(?=sin|cos|tan|√|ln|log)|(?<=\d)(?=sin|cos|tan|√|ln|log)|\%\(";                                              //Klammer direkt neben zahl(kein operator)
+            string regexExpression = @"(?<=\d|\!)\(|\)(?=\d)|\)\(|\)(?=sin|cos|tan|√|ln|log|arcsin|arccos|arctan)|(?<=\d)(?=sin|cos|tan|√|ln|log|arcsin|arccos|arctan)|\%\(";                                              //Klammer direkt neben zahl(kein operator)
 
             string[] klammernMulti = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
@@ -372,7 +414,7 @@ namespace RechnerWPF
                 }
                 if (k == ")")
                 {
-                    Regex rgx = new Regex(@"\)(?=\d+)|\)(?=sin|cos|tan|√|ln|log)");
+                    Regex rgx = new Regex(@"\)(?=\d+)|\)(?=sin|cos|tan|√|ln|log|arcsin|arccos|arctan)");
                     eingabe = rgx.Replace(eingabe, ")*", 1);
                 }
                 if (k == ")(")
@@ -382,7 +424,7 @@ namespace RechnerWPF
                 }
                 if (k == "")
                 {
-                    Regex rgx = new Regex(@"(?<=\d)(?=sin|cos|tan|√|ln|log)");
+                    Regex rgx = new Regex(@"(?<=\d)(?=sin|cos|tan|√|ln|log|arcsin|arccos|arctan)");
                     eingabe = rgx.Replace(eingabe, "*", 1);
                 }
                 if (k == "%(")
@@ -397,7 +439,7 @@ namespace RechnerWPF
 
         static List<string> KlammerFilter(string eingabe)
         {
-            string regexExpression = @"(?<!sin|cos|tan|√|ln|log)\(([^(]*?)\)";                                              //inerste Klammer in einer Klammer
+            string regexExpression = @"(?<!sin|cos|tan|√|ln|log|arcsin|arccos|arctan)\(([^(]*?)\)";                                              //inerste Klammer in einer Klammer
 
             string[] klammern = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => string.Format(m.Value)).ToArray();
 
