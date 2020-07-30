@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 
 namespace RechnerWPF
 {
@@ -19,6 +20,7 @@ namespace RechnerWPF
         string ergebnis = "";
         string ans = "";
         int klammerOffenCount = 0;
+        static bool toogle = false;
         List<double> zahlen;
         List<string> operatoren;
 
@@ -179,6 +181,14 @@ namespace RechnerWPF
         {
             EingabeHinzufügen(ans);
         }
+        private void Toogle_Checked(object sender, RoutedEventArgs e)
+        {
+            toogle = true;
+        }
+        private void Toogle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            toogle = false;
+        }
         private void ButtonGleich_Click(object sender, RoutedEventArgs e)
         {
             if (!zwischenwert.Equals(""))
@@ -276,7 +286,7 @@ namespace RechnerWPF
                     {
                         trigErgebnis = trigErgebnis.Substring(6);
                         trigErgebnis = KlammerRechner(trigErgebnis);
-                        replaceString = Convert.ToDouble(trigErgebnis);
+                        replaceString = DegToRadConverter(Convert.ToDouble(trigErgebnis));
                         trigErgebnis = Convert.ToString(Math.Asin(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
@@ -284,7 +294,7 @@ namespace RechnerWPF
                     {
                         trigErgebnis = trigErgebnis.Substring(3);
                         trigErgebnis = KlammerRechner(trigErgebnis);
-                        replaceString = Convert.ToDouble(trigErgebnis);
+                        replaceString = DegToRadConverter(Convert.ToDouble(trigErgebnis));
                         trigErgebnis = Convert.ToString(Math.Sin(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
@@ -293,7 +303,7 @@ namespace RechnerWPF
                     {
                         trigErgebnis = trigErgebnis.Substring(6);
                         trigErgebnis = KlammerRechner(trigErgebnis);
-                        replaceString = Convert.ToDouble(trigErgebnis);
+                        replaceString = DegToRadConverter(Convert.ToDouble(trigErgebnis));
                         trigErgebnis = Convert.ToString(Math.Acos(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
@@ -301,7 +311,7 @@ namespace RechnerWPF
                     {
                         trigErgebnis = trigErgebnis.Substring(3);
                         trigErgebnis = KlammerRechner(trigErgebnis);
-                        replaceString = Convert.ToDouble(trigErgebnis);
+                        replaceString = DegToRadConverter(Convert.ToDouble(trigErgebnis));
                         trigErgebnis = Convert.ToString(Math.Cos(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
@@ -310,7 +320,7 @@ namespace RechnerWPF
                     {
                         trigErgebnis = trigErgebnis.Substring(6);
                         trigErgebnis = KlammerRechner(trigErgebnis);
-                        replaceString = Convert.ToDouble(trigErgebnis);
+                        replaceString = DegToRadConverter(Convert.ToDouble(trigErgebnis));
                         trigErgebnis = Convert.ToString(Math.Atan(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
@@ -318,7 +328,7 @@ namespace RechnerWPF
                     {
                         trigErgebnis = trigErgebnis.Substring(3);
                         trigErgebnis = KlammerRechner(trigErgebnis);
-                        replaceString = Convert.ToDouble(trigErgebnis);
+                        replaceString = DegToRadConverter(Convert.ToDouble(trigErgebnis));
                         trigErgebnis = Convert.ToString(Math.Tan(replaceString));
                         eingabe = eingabe.Replace(m, trigErgebnis);
                     }
@@ -460,12 +470,32 @@ namespace RechnerWPF
             var zahlen = Regex.Matches(eingabe, regexExpression).OfType<Match>().Select(m => double.Parse(m.Value)).ToArray();
 
             List<double> zahlenList = new List<double>();
+            //if (!toogle)
+            //{
+            //    foreach (double o in zahlen)
+            //    {
+            //        zahlenList.Add(o);
+            //    }
+
+            //    return zahlenList;
+            //} 
+            
             foreach (double o in zahlen)
             {
                 zahlenList.Add(o);
             }
 
             return zahlenList;
+        }
+
+        static double DegToRadConverter(double eingabe)
+        {
+            if (toogle)
+            {
+                eingabe = eingabe * Math.PI / 180;
+            }
+
+            return eingabe;
         }
 
         static List<string> OperatorFilter(string eingabe)
